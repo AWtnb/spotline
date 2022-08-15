@@ -22,7 +22,6 @@ function unSpotlight() {
 }
 
 function spotlight() {
-	console.log(lastFocused)
 	const editor = vscode.window.activeTextEditor;
 	if (!editor) {
 		console.log('no editor is opened.');
@@ -48,8 +47,9 @@ function spotlight() {
 		}
 	}
 	if (!blured || !isLastFocused(editor.selection)) {
+		const config = vscode.workspace.getConfiguration("spotline");
 		dt = vscode.window.createTextEditorDecorationType({
-			opacity: "0.2 !important"
+			opacity: `${config.get("opacity")} !important`
 		});
 		editor.setDecorations(dt, rangesToBlur);
 		blured = true;

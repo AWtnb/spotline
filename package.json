@@ -30,6 +30,18 @@
         "title": "spotline reset"
       }
     ],
+    "configuration": {
+      "title": "spotline",
+      "properties": {
+        "spotline.opacity": {
+          "type": "number",
+          "default": 0.4,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "opacity of unselected lines."
+        }
+      }
+    },
     "keybindings":[
       {
         "command": "spotline.apply",
