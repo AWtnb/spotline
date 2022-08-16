@@ -64,12 +64,12 @@ class Spotter {
 export function activate(context: vscode.ExtensionContext) {
 	const sp = new Spotter();
 
-	context.subscriptions.push(vscode.commands.registerCommand('spotline.apply',
-		() => sp.spotlight()
-	));
-	context.subscriptions.push(vscode.commands.registerCommand('spotline.reset',
-		() => sp.unSpotlight()
-	));
+	context.subscriptions.push(
+		vscode.commands.registerCommand( 'spotline.apply', () => sp.spotlight() )
+	);
+	context.subscriptions.push(
+		vscode.commands.registerCommand( 'spotline.reset', () => sp.unSpotlight() )
+	);
 
 }
 
