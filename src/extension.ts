@@ -4,28 +4,13 @@ import * as vscode from 'vscode';
 
 class Spotter {
 	deco: vscode.TextEditorDecorationType;
-	blured: boolean;
-	lastFocused: number[];
+	focusStart: number;
+	focusEnd: number;
 
 	constructor() {
 		this.deco = vscode.window.createTextEditorDecorationType({});
-		this.blured = false;
-		this.lastFocused = [-1, -1];
-	}
-
-	isLastFocused(sel: vscode.Selection) {
-		if (sel.start.line == this.lastFocused[0]) {
-			return true;
-		}
-		if (sel.end.line == this.lastFocused[1]) {
-			return true;
-		}
-		return false;
-	}
-
-	unSpotlight() {
-		this.deco.dispose();
-		this.blured = false;
+		this.focusStart = -1;
+		this.focusEnd = -1;
 	}
 
 	spotlight() {
@@ -34,41 +19,50 @@ class Spotter {
 			console.log('no editor is opened.');
 			return
 		}
+
+		const selTop = editor.selection.start.line;
+		const selBottom = editor.selection.end.line;
+
+		this.deco.dispose();
+		if (selTop == this.focusStart && selBottom == this.focusEnd) {
+			this.focusStart = -1;
+			this.focusEnd = -1;
+			return;
+		}
+
 		const docStart = new vscode.Position(0, 0);
 		const docEnd = editor.document.lineAt(editor.document.lineCount - 1).rangeIncludingLineBreak.end;
-		const rangesToBlur = [];
-		const selTop = editor.selection.start.line;
+		const blurRange = [];
 		if (selTop > 0) {
 			const prevLineEnd = editor.document.lineAt(selTop - 1).rangeIncludingLineBreak.end;
-			rangesToBlur.push(new vscode.Range(docStart, prevLineEnd));
+			blurRange.push(new vscode.Range(docStart, prevLineEnd));
 		}
-		const selBottom = editor.selection.end.line;
 		if (selBottom < editor.document.lineCount - 1) {
 			const nextLineStart = editor.document.lineAt(selBottom + 1).range.start;
-			rangesToBlur.push(new vscode.Range(nextLineStart, docEnd));
+			blurRange.push(new vscode.Range(nextLineStart, docEnd));
 		}
-		if (this.blured) {
-			this.unSpotlight();
-			if (this.isLastFocused(editor.selection)) {
-				return;
-			}
-		}
-		if (!this.blured || !this.isLastFocused(editor.selection)) {
-			const config = vscode.workspace.getConfiguration("spotline");
-			this.deco = vscode.window.createTextEditorDecorationType({
-				opacity: `${config.get("opacity")} !important`
-			});
-			editor.setDecorations(this.deco, rangesToBlur);
-			this.blured = true;
-		}
-		this.lastFocused = [selTop, selBottom];
+		const config = vscode.workspace.getConfiguration("spotline");
+		this.deco = vscode.window.createTextEditorDecorationType({
+			opacity: `${config.get("opacity")} !important`
+		});
+		editor.setDecorations(this.deco, blurRange);
+
+		this.focusStart = selTop;
+		this.focusEnd = selBottom;
+
+	}
+
+	unSpotlight() {
+		this.deco.dispose();
+		this.focusStart = -1;
+		this.focusEnd = -1;
 	}
 
 }
 
-const sp = new Spotter();
 
 export function activate(context: vscode.ExtensionContext) {
+	const sp = new Spotter();
 
 	context.subscriptions.push(vscode.commands.registerCommand('spotline.apply',
 		() => sp.spotlight()
