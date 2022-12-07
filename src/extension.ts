@@ -20,12 +20,7 @@ class Spotter {
     this.focusEnd = -1;
   }
 
-  spotlight() {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-      console.log("no editor is opened.");
-      return;
-    }
+  spotlight(editor: vscode.TextEditor) {
     const selTop = editor.selection.start.line;
     const selBottom = editor.selection.end.line;
 
@@ -54,27 +49,30 @@ class Spotter {
     this.focusEnd = selBottom;
   }
 
-  unSpotlight() {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-      console.log("no editor is opened.");
-      return;
-    }
+  unSpotlight(editor: vscode.TextEditor) {
     this.clrearDeco(editor);
     this.resetPosition();
   }
 }
 
-const getOpacityConfig = ():number => {
-	const config = vscode.workspace.getConfiguration("spotline");
-	return config.get("opacity") || 0.4;
-}
+const getOpacityConfig = (): number => {
+  const config = vscode.workspace.getConfiguration("spotline");
+  return config.get("opacity") || 0.4;
+};
 
 const SPOTTER = new Spotter(getOpacityConfig());
 
 export function activate(context: vscode.ExtensionContext) {
-  context.subscriptions.push(vscode.commands.registerCommand("spotline.apply", () => SPOTTER.spotlight()));
-  context.subscriptions.push(vscode.commands.registerCommand("spotline.reset", () => SPOTTER.unSpotlight()));
+  context.subscriptions.push(
+    vscode.commands.registerTextEditorCommand("spotline.apply", (editor: vscode.TextEditor) => {
+      SPOTTER.spotlight(editor);
+    })
+  );
+  context.subscriptions.push(
+    vscode.commands.registerTextEditorCommand("spotline.reset", (editor: vscode.TextEditor) => {
+      SPOTTER.unSpotlight(editor);
+    })
+  );
 }
 
 vscode.window.onDidChangeActiveTextEditor(() => {
