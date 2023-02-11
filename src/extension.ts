@@ -2,33 +2,23 @@ import * as vscode from "vscode";
 
 class Spotter {
   readonly deco: vscode.TextEditorDecorationType;
-  focusStart: number = -1;
-  focusEnd: number = -1;
+  applied: boolean;
 
   constructor(opacity: number) {
     this.deco = vscode.window.createTextEditorDecorationType({
       opacity: `${opacity} !important`,
     });
+    this.applied = false;
   }
 
   private clearDeco(editor: vscode.TextEditor) {
     editor.setDecorations(this.deco, []);
-  }
-
-  resetPosition() {
-    this.focusStart = -1;
-    this.focusEnd = -1;
+    this.applied = false;
   }
 
   spotlight(editor: vscode.TextEditor) {
     const selTop = editor.selection.start.line;
     const selBottom = editor.selection.end.line;
-
-    this.clearDeco(editor);
-    if (selTop == this.focusStart && selBottom == this.focusEnd) {
-      this.resetPosition();
-      return;
-    }
 
     const docStart = new vscode.Position(0, 0);
     const docEnd = editor.document.lineAt(editor.document.lineCount - 1).rangeIncludingLineBreak.end;
@@ -45,13 +35,12 @@ class Spotter {
 
     editor.setDecorations(this.deco, blurTarget);
 
-    this.focusStart = selTop;
-    this.focusEnd = selBottom;
+    this.applied = true;
   }
 
   unSpotlight(editor: vscode.TextEditor) {
     this.clearDeco(editor);
-    this.resetPosition();
+    this.applied = false;
   }
 }
 
@@ -65,7 +54,11 @@ const SPOTTER = new Spotter(getOpacityConfig());
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerTextEditorCommand("spotline.apply", (editor: vscode.TextEditor) => {
-      SPOTTER.spotlight(editor);
+      if (!SPOTTER.applied) {
+        SPOTTER.spotlight(editor);
+      } else {
+        SPOTTER.unSpotlight(editor);
+      }
     })
   );
   context.subscriptions.push(
@@ -75,8 +68,10 @@ export function activate(context: vscode.ExtensionContext) {
   );
 }
 
-vscode.window.onDidChangeActiveTextEditor(() => {
-  SPOTTER.resetPosition();
+vscode.window.onDidChangeTextEditorSelection((ev) => {
+  if (SPOTTER.applied) {
+    SPOTTER.spotlight(ev.textEditor);
+  }
 });
 
 export function deactivate() {}
