@@ -11,7 +11,7 @@ class Spotter {
     });
   }
 
-  private clrearDeco(editor: vscode.TextEditor) {
+  private clearDeco(editor: vscode.TextEditor) {
     editor.setDecorations(this.deco, []);
   }
 
@@ -24,7 +24,7 @@ class Spotter {
     const selTop = editor.selection.start.line;
     const selBottom = editor.selection.end.line;
 
-    this.clrearDeco(editor);
+    this.clearDeco(editor);
     if (selTop == this.focusStart && selBottom == this.focusEnd) {
       this.resetPosition();
       return;
@@ -50,7 +50,7 @@ class Spotter {
   }
 
   unSpotlight(editor: vscode.TextEditor) {
-    this.clrearDeco(editor);
+    this.clearDeco(editor);
     this.resetPosition();
   }
 }
