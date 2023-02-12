@@ -20,16 +20,16 @@ class Spotter {
     const selTop = editor.selection.start.line;
     const selBottom = editor.selection.end.line;
 
-    const docStart = new vscode.Position(0, 0);
-    const docEnd = editor.document.lineAt(editor.document.lineCount - 1).rangeIncludingLineBreak.end;
     const blurTarget = [];
 
     if (selTop > 0) {
+      const docStart = new vscode.Position(0, 0);
       const prevLineEnd = editor.document.lineAt(selTop - 1).rangeIncludingLineBreak.end;
       blurTarget.push(new vscode.Range(docStart, prevLineEnd));
     }
     if (selBottom < editor.document.lineCount - 1) {
       const nextLineStart = editor.document.lineAt(selBottom + 1).range.start;
+      const docEnd = editor.document.lineAt(editor.document.lineCount - 1).rangeIncludingLineBreak.end;
       blurTarget.push(new vscode.Range(nextLineStart, docEnd));
     }
 
@@ -44,34 +44,28 @@ class Spotter {
   }
 }
 
-const getOpacityConfig = (): number => {
-  const config = vscode.workspace.getConfiguration("spotline");
-  return config.get("opacity") || 0.4;
-};
-
-const SPOTTER = new Spotter(getOpacityConfig());
-
 export function activate(context: vscode.ExtensionContext) {
+  const config = vscode.workspace.getConfiguration("spotline");
+  const opacity = Number(config.get("opacity")) || 0.4;
+  const SPOTTER = new Spotter(opacity);
+
   context.subscriptions.push(
-    vscode.commands.registerTextEditorCommand("spotline.apply", (editor: vscode.TextEditor) => {
-      if (!SPOTTER.applied) {
-        SPOTTER.spotlight(editor);
+    vscode.commands.registerCommand("spotline.apply", () => {
+      if (SPOTTER.applied) {
+        vscode.window.visibleTextEditors.forEach((editor) => SPOTTER.unSpotlight(editor));
       } else {
-        SPOTTER.unSpotlight(editor);
+        vscode.window.visibleTextEditors.forEach((editor) => SPOTTER.spotlight(editor));
       }
     })
   );
-  context.subscriptions.push(
-    vscode.commands.registerTextEditorCommand("spotline.reset", (editor: vscode.TextEditor) => {
-      SPOTTER.unSpotlight(editor);
-    })
-  );
-}
 
-vscode.window.onDidChangeTextEditorSelection((ev) => {
-  if (SPOTTER.applied) {
-    SPOTTER.spotlight(ev.textEditor);
-  }
-});
+  vscode.window.onDidChangeTextEditorSelection((ev) => {
+    if (SPOTTER.applied) {
+      SPOTTER.spotlight(ev.textEditor);
+    } else {
+      SPOTTER.unSpotlight(ev.textEditor);
+    }
+  });
+}
 
 export function deactivate() {}
