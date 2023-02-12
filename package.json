@@ -23,11 +23,11 @@
     "commands": [
       {
         "command": "spotline.apply",
-        "title": "spotline current line"
+        "title": "spotline: apply"
       },
       {
         "command": "spotline.reset",
-        "title": "spotline reset"
+        "title": "spotline: reset"
       }
     ],
     "configuration": {
@@ -36,8 +36,8 @@
         "spotline.opacity": {
           "type": "number",
           "default": 0.4,
-          "minimum": 0,
-          "maximum": 1,
+          "minimum": 0.1,
+          "maximum": 0.9,
           "description": "opacity of unselected lines."
         }
       }
