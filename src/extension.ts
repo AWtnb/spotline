@@ -59,6 +59,14 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
+  context.subscriptions.push(
+    vscode.commands.registerCommand("spotline.reset", () => {
+      if (SPOTTER.applied) {
+        vscode.window.visibleTextEditors.forEach((editor) => SPOTTER.unSpotlight(editor));
+      }
+    })
+  );
+
   vscode.window.onDidChangeTextEditorSelection((ev) => {
     if (SPOTTER.applied) {
       SPOTTER.spotlight(ev.textEditor);
