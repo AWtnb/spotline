@@ -14,6 +14,11 @@
   "categories": [
     "Other"
   ],
+  "keywords": [
+    "Focus",
+    "Highlight",
+    "Noise-reduction"
+  ],
   "activationEvents": [
     "onCommand:spotline.apply",
     "onCommand:spotline.reset"
