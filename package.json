@@ -28,11 +28,13 @@
     "commands": [
       {
         "command": "spotline.apply",
-        "title": "spotline: apply"
+        "title": "apply",
+        "category": "spotline"
       },
       {
         "command": "spotline.reset",
-        "title": "spotline: reset"
+        "title": "reset",
+        "category": "spotline"
       }
     ],
     "configuration": {
