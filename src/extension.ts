@@ -11,16 +11,11 @@ class Spotter {
     this.applied = false;
   }
 
-  isEnabled(): boolean {
+  isApplied(): boolean {
     return this.applied;
   }
 
-  private clearDeco(editor: vscode.TextEditor) {
-    editor.setDecorations(this.deco, []);
-    this.applied = false;
-  }
-
-  spotlight(editor: vscode.TextEditor) {
+  apply(editor: vscode.TextEditor) {
     const selTop = editor.selection.start.line;
     const selBottom = editor.selection.end.line;
 
@@ -42,8 +37,8 @@ class Spotter {
     this.applied = true;
   }
 
-  unSpotlight(editor: vscode.TextEditor) {
-    this.clearDeco(editor);
+  reset(editor: vscode.TextEditor) {
+    editor.setDecorations(this.deco, []);
     this.applied = false;
   }
 }
@@ -55,25 +50,31 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand("spotline.apply", () => {
-      if (SPOTTER.isEnabled()) {
-        vscode.window.visibleTextEditors.forEach((editor) => SPOTTER.unSpotlight(editor));
+      if (SPOTTER.isApplied()) {
+        vscode.window.visibleTextEditors.forEach((editor) => SPOTTER.reset(editor));
       } else {
-        vscode.window.visibleTextEditors.forEach((editor) => SPOTTER.spotlight(editor));
+        vscode.window.visibleTextEditors.forEach((editor) => SPOTTER.apply(editor));
       }
     })
   );
 
   context.subscriptions.push(
     vscode.commands.registerCommand("spotline.reset", () => {
-      if (SPOTTER.isEnabled()) {
-        vscode.window.visibleTextEditors.forEach((editor) => SPOTTER.unSpotlight(editor));
+      if (SPOTTER.isApplied()) {
+        vscode.window.visibleTextEditors.forEach((editor) => SPOTTER.reset(editor));
       }
     })
   );
 
+  vscode.window.onDidChangeActiveTextEditor((editor) => {
+    if (editor && SPOTTER.isApplied()) {
+      SPOTTER.apply(editor);
+    }
+  });
+
   vscode.window.onDidChangeTextEditorSelection((ev) => {
-    if (SPOTTER.isEnabled()) {
-      SPOTTER.spotlight(ev.textEditor);
+    if (SPOTTER.isApplied()) {
+      SPOTTER.apply(ev.textEditor);
     }
   });
 }
