@@ -1,14 +1,18 @@
 import * as vscode from "vscode";
 
 class Spotter {
-  readonly deco: vscode.TextEditorDecorationType;
-  applied: boolean;
+  private readonly deco: vscode.TextEditorDecorationType;
+  private applied: boolean;
 
   constructor(opacity: number) {
     this.deco = vscode.window.createTextEditorDecorationType({
       opacity: `${opacity} !important`,
     });
     this.applied = false;
+  }
+
+  isEnabled(): boolean {
+    return this.applied;
   }
 
   private clearDeco(editor: vscode.TextEditor) {
@@ -51,7 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand("spotline.apply", () => {
-      if (SPOTTER.applied) {
+      if (SPOTTER.isEnabled()) {
         vscode.window.visibleTextEditors.forEach((editor) => SPOTTER.unSpotlight(editor));
       } else {
         vscode.window.visibleTextEditors.forEach((editor) => SPOTTER.spotlight(editor));
@@ -61,17 +65,15 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand("spotline.reset", () => {
-      if (SPOTTER.applied) {
+      if (SPOTTER.isEnabled()) {
         vscode.window.visibleTextEditors.forEach((editor) => SPOTTER.unSpotlight(editor));
       }
     })
   );
 
   vscode.window.onDidChangeTextEditorSelection((ev) => {
-    if (SPOTTER.applied) {
+    if (SPOTTER.isEnabled()) {
       SPOTTER.spotlight(ev.textEditor);
-    } else {
-      SPOTTER.unSpotlight(ev.textEditor);
     }
   });
 }
