@@ -45,7 +45,12 @@
           "default": 0.4,
           "minimum": 0.1,
           "maximum": 0.9,
-          "description": "opacity of unselected lines."
+          "description": "Opacity of unselected lines."
+        },
+        "spotline.asTypewriter": {
+          "type":"boolean",
+          "default": true,
+          "description": "If enabled, keep first selection in the center of window."
         }
       }
     },

@@ -5,6 +5,7 @@ import { Spotter } from "./spotter";
 export function activate(context: vscode.ExtensionContext) {
   const config = vscode.workspace.getConfiguration("spotline");
   const opacity = Number(config.get("opacity")) || 0.4;
+  const asTypewriter = Boolean(config.get("asTypewriter")) || false;
   const SPOTTER = new Spotter(opacity);
 
   context.subscriptions.push(
@@ -33,7 +34,13 @@ export function activate(context: vscode.ExtensionContext) {
 
   vscode.window.onDidChangeTextEditorSelection((ev) => {
     if (SPOTTER.isApplied()) {
-      SPOTTER.apply(ev.textEditor);
+      const editor = ev.textEditor;
+      SPOTTER.apply(editor);
+      if (asTypewriter) {
+        const a = editor.selection.active;
+        const r = new vscode.Range(a, a);
+        editor.revealRange(r, vscode.TextEditorRevealType.InCenter);
+      }
     }
   });
 }
