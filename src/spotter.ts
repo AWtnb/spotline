@@ -74,8 +74,8 @@ export class Spotter {
   }
 
   apply(editor: vscode.TextEditor) {
-    const st = new EditorCursors(editor);
-    const blurTarget = st.getInterCursorRanges();
+    const cursors = new EditorCursors(editor);
+    const blurTarget = cursors.getInterCursorRanges();
     editor.setDecorations(this.deco, blurTarget);
     this.applied = true;
   }
