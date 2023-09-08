@@ -15,7 +15,7 @@ Got inspired by: [L3v3L/vs-focus](https://github.com/L3v3L/vs-focus).
 In `settings.json` :
 
 + Opacity of unselected lines can be modified with `spotline.opacity` .
-+ If `spotline.asTypeWriter` is `true`, keep first selection in the center of window.
++ If `spotline.asTypewriter` is `true`, keep first selection in the center of window.
 
 ## Planned feature
 
