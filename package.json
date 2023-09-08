@@ -4,7 +4,7 @@
   "description": "spotlite on current line!",
   "icon": "images/logo.png",
   "publisher": "awtnb",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "repository": {
     "url": "https://github.com/AWtnb/vscode-spotline"
   },
