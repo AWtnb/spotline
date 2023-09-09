@@ -2,6 +2,21 @@ import * as vscode from "vscode";
 
 import { Spotter } from "./spotter";
 
+const stickToCursor = (editor: vscode.TextEditor) => {
+  const visible = editor.visibleRanges[0];
+  const half = Math.ceil((visible.end.line - visible.start.line) / 2);
+  const a = editor.selections[0].active;
+  const buffer = 4; // manually tuned
+  if (a.line < visible.start.line + half - buffer) {
+    return;
+  }
+  if (visible.end.line - half + buffer < a.line) {
+    return;
+  }
+  const r = new vscode.Range(a, a);
+  editor.revealRange(r, vscode.TextEditorRevealType.InCenter);
+};
+
 export function activate(context: vscode.ExtensionContext) {
   const config = vscode.workspace.getConfiguration("spotline");
   const opacity = Number(config.get("opacity")) || 0.4;
@@ -37,9 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
       const editor = ev.textEditor;
       SPOTTER.apply(editor);
       if (asTypewriter) {
-        const a = editor.selection.active;
-        const r = new vscode.Range(a, a);
-        editor.revealRange(r, vscode.TextEditorRevealType.InCenter);
+        stickToCursor(editor);
       }
     }
   });
