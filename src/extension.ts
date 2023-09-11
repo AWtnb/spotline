@@ -3,16 +3,7 @@ import * as vscode from "vscode";
 import { Spotter } from "./spotter";
 
 const stickToCursor = (editor: vscode.TextEditor) => {
-  const visible = editor.visibleRanges[0];
-  const half = Math.ceil((visible.end.line - visible.start.line) / 2);
   const a = editor.selections[0].active;
-  const buffer = 4; // manually tuned
-  if (a.line < visible.start.line + half - buffer) {
-    return;
-  }
-  if (visible.end.line - half + buffer < a.line) {
-    return;
-  }
   const r = new vscode.Range(a, a);
   editor.revealRange(r, vscode.TextEditorRevealType.InCenter);
 };
@@ -28,7 +19,10 @@ export function activate(context: vscode.ExtensionContext) {
       if (SPOTTER.isApplied()) {
         vscode.window.visibleTextEditors.forEach((editor) => SPOTTER.reset(editor));
       } else {
-        vscode.window.visibleTextEditors.forEach((editor) => SPOTTER.apply(editor));
+        vscode.window.visibleTextEditors.forEach((editor) => {
+          stickToCursor(editor);
+          SPOTTER.apply(editor);
+        });
       }
     })
   );
@@ -58,7 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
     if (SPOTTER.isApplied()) {
       const editor = ev.textEditor;
       SPOTTER.apply(editor);
-      if (asTypewriter) {
+      if (asTypewriter && ev.kind == vscode.TextEditorSelectionChangeKind.Keyboard) {
         stickToCursor(editor);
       }
     }
