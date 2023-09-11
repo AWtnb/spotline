@@ -47,6 +47,13 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
+  vscode.workspace.onDidChangeTextDocument(() => {
+    const editor = vscode.window.activeTextEditor;
+    if (editor && SPOTTER.isApplied()) {
+      SPOTTER.apply(editor);
+    }
+  });
+
   vscode.window.onDidChangeTextEditorSelection((ev) => {
     if (SPOTTER.isApplied()) {
       const editor = ev.textEditor;
