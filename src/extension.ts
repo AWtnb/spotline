@@ -52,7 +52,10 @@ export function activate(context: vscode.ExtensionContext) {
     if (SPOTTER.isApplied()) {
       const editor = ev.textEditor;
       SPOTTER.apply(editor);
-      if (asTypewriter && ev.kind == vscode.TextEditorSelectionChangeKind.Keyboard) {
+      if (asTypewriter) {
+        if (ev.kind == vscode.TextEditorSelectionChangeKind.Mouse) {
+          return;
+        }
         stickToCursor(editor);
       }
     }
