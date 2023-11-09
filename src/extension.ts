@@ -12,7 +12,7 @@ export function activate(context: vscode.ExtensionContext) {
   const config = vscode.workspace.getConfiguration("spotline");
   const opacity = Number(config.get("opacity")) || 0.4;
   const asTypewriter = Boolean(config.get("asTypewriter")) || false;
-  const SPOTTER = new Spotter(opacity);
+  const SPOTTER = new Spotter(opacity, asTypewriter);
 
   context.subscriptions.push(
     vscode.commands.registerCommand("spotline.apply", () => {
@@ -20,7 +20,9 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.visibleTextEditors.forEach((editor) => SPOTTER.reset(editor));
       } else {
         vscode.window.visibleTextEditors.forEach((editor) => {
-          stickToCursor(editor);
+          if (SPOTTER.isTypewriterMode()) {
+            stickToCursor(editor);
+          }
           SPOTTER.apply(editor);
         });
       }
@@ -32,6 +34,12 @@ export function activate(context: vscode.ExtensionContext) {
       if (SPOTTER.isApplied()) {
         vscode.window.visibleTextEditors.forEach((editor) => SPOTTER.reset(editor));
       }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("spotline.toggleTypewriter", () => {
+      SPOTTER.toggleTypewriterMode();
     })
   );
 
@@ -52,7 +60,7 @@ export function activate(context: vscode.ExtensionContext) {
     if (SPOTTER.isApplied()) {
       const editor = ev.textEditor;
       SPOTTER.apply(editor);
-      if (asTypewriter) {
+      if (SPOTTER.isTypewriterMode()) {
         if (ev.kind == vscode.TextEditorSelectionChangeKind.Mouse) {
           return;
         }

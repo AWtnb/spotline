@@ -89,16 +89,26 @@ class EditorCursors {
 export class Spotter {
   private readonly deco: vscode.TextEditorDecorationType;
   private applied: boolean;
+  private asTypewriter: boolean;
 
-  constructor(opacity: number) {
+  constructor(opacity: number, asTypewriter: boolean) {
     this.deco = vscode.window.createTextEditorDecorationType({
       opacity: `${opacity} !important`,
     });
     this.applied = false;
+    this.asTypewriter = asTypewriter;
   }
 
   isApplied(): boolean {
     return this.applied;
+  }
+
+  isTypewriterMode(): boolean {
+    return this.asTypewriter;
+  }
+
+  toggleTypewriterMode() {
+    this.asTypewriter = !this.asTypewriter;
   }
 
   apply(editor: vscode.TextEditor) {

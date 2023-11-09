@@ -35,6 +35,11 @@
         "command": "spotline.reset",
         "title": "reset",
         "category": "spotline"
+      },
+      {
+        "command": "spotline.toggleTypewriter",
+        "title": "toggleTypewriter",
+        "category": "spotline"
       }
     ],
     "configuration": {
