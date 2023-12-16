@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import { Spotter } from "./spotter";
 
 const stickToCursor = (editor: vscode.TextEditor) => {
-  const a = editor.selections[0].active;
+  const a = editor.selections.slice(-1)[0].active;
   const r = new vscode.Range(a, a);
   editor.revealRange(r, vscode.TextEditorRevealType.InCenter);
 };
