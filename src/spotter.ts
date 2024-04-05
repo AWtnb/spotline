@@ -8,8 +8,8 @@ class EditorCursors {
 
   private toLineRanges(): vscode.Range[] {
     return this._editor.selections.map((sel) => {
-      const start = new vscode.Position(sel.start.line, 0);
-      const end = new vscode.Position(sel.end.line, this._editor.document.lineAt(sel.end.line).text.length);
+      const start = this.getLineStart(sel.start.line);
+      const end = this.getLineEnd(sel.end.line);
       return new vscode.Range(start, end);
     });
   }
